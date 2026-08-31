@@ -1,0 +1,478 @@
+<title>Griha Pravesham</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yatra+One&family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=EB+Garamond:wght@400;500;600&display=swap">
+<style>
+  :root{
+    --maroon-950:#3B0F14;
+    --maroon-900:#4A1219;
+    --maroon-800:#6B1B23;
+    --maroon-700:#82232C;
+    --gold-700:#9C7326;
+    --gold-500:#C99A3D;
+    --gold-300:#E8C878;
+    --marigold-500:#E2761F;
+    --marigold-400:#EF9A42;
+    --leaf-600:#5B7444;
+    --ivory-100:#FBF1DE;
+    --ivory-200:#F3E6C8;
+    --ink-900:#3A2113;
+    --ink-700:#5A3A22;
+  }
+
+  *{box-sizing:border-box;}
+
+  body{
+    background:
+      radial-gradient(ellipse 80% 50% at 50% 0%, var(--maroon-800) 0%, var(--maroon-900) 55%, var(--maroon-950) 100%);
+    background-attachment:fixed;
+    color:var(--ivory-100);
+    min-height:100vh;
+    overflow-x:hidden;
+    font-family:"EB Garamond","Iowan Old Style",Georgia,serif;
+  }
+  body.locked{ overflow:hidden; height:100vh; }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
+  }
+
+  #petal-canvas{
+    position:fixed; inset:0; width:100%; height:100%;
+    pointer-events:none; z-index:1;
+  }
+
+  /* ---------- toran garland ---------- */
+  .toran{ position:relative; display:flex; justify-content:center; align-items:flex-end;
+    padding-top:10px; z-index:3; filter:drop-shadow(0 6px 10px rgba(0,0,0,0.35)); }
+  .toran::before{ content:""; position:absolute; top:6px; left:6%; right:6%; height:2px;
+    background:linear-gradient(90deg, transparent, var(--gold-500) 8%, var(--gold-500) 92%, transparent); }
+  .toran-unit{ display:flex; flex-direction:column; align-items:center; width:30px; }
+  .toran-unit:nth-child(odd){ margin-top:9px; }
+  .toran-unit:nth-child(3n){ margin-top:14px; }
+  .toran-string{ width:1px; height:9px; background:var(--gold-700); }
+  .toran-leaf{ width:18px; height:23px; background:linear-gradient(160deg, var(--leaf-600), #3f5730);
+    clip-path:polygon(50% 0%, 100% 45%, 68% 100%, 50% 82%, 32% 100%, 0% 45%);
+    box-shadow:inset 0 0 4px rgba(0,0,0,0.35); }
+  .toran-bell{ width:11px; height:11px; margin-top:2px; border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, var(--marigold-400), var(--marigold-500) 70%, #b95c12);
+    box-shadow:0 0 6px rgba(226,118,31,0.6); }
+
+  /* ---------- cover gate ---------- */
+  #cover{
+    position:fixed; inset:0; z-index:30;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    background:radial-gradient(ellipse 80% 60% at 50% 0%, var(--maroon-800) 0%, var(--maroon-900) 55%, var(--maroon-950) 100%);
+    padding:2rem 1.25rem; text-align:center;
+    transition:opacity 0.6s ease, transform 0.6s ease;
+  }
+  #cover.opening{ opacity:0; transform:scale(0.94); pointer-events:none; }
+  .cover-body{ max-width:520px; }
+  .eyebrow{ font-family:"EB Garamond", serif; font-size:0.8rem; letter-spacing:0.45em;
+    text-transform:uppercase; color:var(--gold-300); margin:1.4rem 0 0.75rem; }
+  .cover-title{ font-family:"Yatra One", cursive; font-size:clamp(2.6rem, 8vw, 4rem);
+    line-height:1.15; color:var(--gold-300); text-shadow:0 2px 18px rgba(201,154,61,0.35);
+    margin:0; text-wrap:balance; }
+  .cover-subtitle{ font-family:"Cormorant Garamond", serif; font-style:italic; font-size:1.35rem;
+    color:var(--ivory-200); margin:0.6rem 0 3rem; }
+
+  .seal-wrap{ display:flex; flex-direction:column; align-items:center; gap:1.1rem; }
+  .seal{ position:relative; width:132px; height:132px; border-radius:50%; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    background:radial-gradient(circle at 38% 32%, var(--marigold-400) 0%, var(--marigold-500) 45%, #A6480F 100%);
+    box-shadow:0 0 0 4px var(--maroon-950), 0 0 0 6px var(--gold-500), 0 12px 28px rgba(0,0,0,0.45);
+    color:var(--ivory-100); }
+  .seal::before{ content:""; position:absolute; inset:-14px; border-radius:50%;
+    border:1px solid rgba(232,200,120,0.55); animation:pulse-ring 2.6s ease-out infinite; }
+  @keyframes pulse-ring{ 0%{transform:scale(0.92);opacity:0.9;} 80%,100%{transform:scale(1.28);opacity:0;} }
+  .seal:focus-visible{ outline:3px solid var(--gold-300); outline-offset:6px; }
+  .seal svg{ width:52px; height:52px; }
+  .flame{ transform-origin:50% 100%; animation:flicker 1.8s ease-in-out infinite; }
+  @keyframes flicker{ 0%,100%{transform:scaleY(1) scaleX(1) rotate(0deg);}
+    30%{transform:scaleY(1.08) scaleX(0.95) rotate(-2deg);} 60%{transform:scaleY(0.95) scaleX(1.05) rotate(2deg);} }
+  .open-label{ font-family:"EB Garamond", serif; font-size:0.95rem; letter-spacing:0.2em;
+    text-transform:uppercase; color:var(--gold-300); }
+
+  /* ---------- main scroll page ---------- */
+  #main{ position:relative; z-index:2; opacity:0; }
+  #main.show{ opacity:1; transition:opacity 0.8s ease; }
+  .page-header{ display:flex; flex-direction:column; align-items:center; }
+
+  .block{
+    max-width:480px; margin:0 auto; padding:3rem 1.25rem;
+    display:flex; flex-direction:column; align-items:center; text-align:center;
+    opacity:0; transform:translateY(22px); transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .block.in-view{ opacity:1; transform:translateY(0); }
+  .block-wide{ max-width:560px; }
+
+  .divider{ display:flex; align-items:center; gap:0.9rem; width:100%; max-width:280px;
+    margin:0 auto; opacity:0.85; }
+  .divider .line{ flex:1; height:1px; background:linear-gradient(90deg, transparent, var(--gold-500)); }
+  .divider .line.right{ background:linear-gradient(90deg, var(--gold-500), transparent); }
+  .divider svg{ width:16px; height:16px; color:var(--gold-300); flex:none; }
+
+  .panel{
+    position:relative; width:100%;
+    background:linear-gradient(180deg, var(--ivory-100), var(--ivory-200));
+    color:var(--ink-900); border-radius:6px; padding:2.4rem 1.8rem;
+    box-shadow:0 26px 54px rgba(0,0,0,0.4), 0 0 0 1px var(--gold-500), 0 0 0 7px var(--maroon-900), 0 0 0 8px var(--gold-500);
+  }
+  .corner{ position:absolute; width:30px; height:30px; opacity:0.85; }
+  .corner svg{ width:100%; height:100%; }
+  .corner.tl{ top:9px; left:9px; }
+  .corner.tr{ top:9px; right:9px; transform:scaleX(-1); }
+  .corner.bl{ bottom:9px; left:9px; transform:scaleY(-1); }
+  .corner.br{ bottom:9px; right:9px; transform:scale(-1,-1); }
+
+  .card-eyebrow{ font-family:"EB Garamond", serif; font-size:0.72rem; letter-spacing:0.35em;
+    text-transform:uppercase; color:var(--gold-700); margin:0 0 0.4rem; }
+  .card-title{ font-family:"Yatra One", cursive; font-size:1.9rem; color:var(--maroon-800); margin:0 0 0.8rem; }
+  .lead{ font-family:"Cormorant Garamond", serif; font-style:italic; font-size:1.15rem; line-height:1.6;
+    color:var(--ink-700); max-width:36ch; margin:0 auto; text-wrap:balance; }
+  .host-name{ font-style:normal; font-weight:600; color:var(--maroon-800); }
+  .dates{ font-family:"Cormorant Garamond", serif; font-weight:600; font-size:1.3rem; color:var(--gold-300);
+    margin-top:0.6rem; }
+
+  /* kalash / deity medallion */
+  .medallion{ display:flex; justify-content:center; margin-bottom:0.6rem; }
+  .medallion svg{ width:120px; height:120px; }
+
+  /* body copy inside panels */
+  .body-copy{ font-size:1.05rem; line-height:1.75; color:var(--ink-700); text-align:left; }
+
+  /* countdown */
+  .countdown-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:0.7rem; width:100%; margin-top:0.5rem; }
+  .countdown-chip{ background:var(--maroon-900); border:1px solid var(--gold-700); border-radius:6px;
+    padding:0.85rem 0.3rem; }
+  .countdown-num{ font-family:"EB Garamond", serif; font-variant-numeric:tabular-nums; font-weight:600;
+    font-size:1.7rem; color:var(--gold-300); display:block; }
+  .countdown-label{ font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--ivory-200); }
+
+  /* schedule */
+  .day-panel{ text-align:left; margin-bottom:1.4rem; width:100%; }
+  .day-panel:last-child{ margin-bottom:0; }
+  .day-title{ font-family:"Yatra One", cursive; font-size:1.2rem; color:var(--maroon-800);
+    margin:0 0 0.9rem; text-align:center; }
+  .agenda-row{ display:flex; gap:0.9rem; padding:0.55rem 0; border-top:1px solid rgba(156,115,38,0.25); }
+  .agenda-row:first-of-type{ border-top:none; }
+  .agenda-time{ flex:none; width:6.4rem; font-variant-numeric:tabular-nums; font-weight:600; color:var(--marigold-500); }
+  .agenda-event{ color:var(--ink-900); }
+
+  /* detail rows (venue) */
+  .detail-row{ display:flex; align-items:flex-start; gap:0.7rem; text-align:left; width:100%; }
+  .detail-row svg{ width:19px; height:19px; flex:none; margin-top:0.15rem; color:var(--marigold-500); }
+  .detail-label{ display:block; font-family:"EB Garamond", serif; font-size:0.68rem; letter-spacing:0.22em;
+    text-transform:uppercase; color:var(--gold-700); }
+  .detail-value{ font-size:1.05rem; color:var(--ink-900); }
+
+  .map-btn{ display:inline-flex; align-items:center; gap:0.5rem; margin-top:1.4rem; padding:0.7rem 1.5rem;
+    border:1.5px solid var(--maroon-800); border-radius:999px; color:var(--maroon-800); text-decoration:none;
+    font-size:0.85rem; letter-spacing:0.08em; text-transform:uppercase; transition:background 0.2s ease, color 0.2s ease; }
+  .map-btn:hover, .map-btn:focus-visible{ background:var(--maroon-800); color:var(--ivory-100); }
+  .map-btn svg{ width:16px; height:16px; }
+
+  .blessing{ font-family:"Cormorant Garamond", serif; font-style:italic; font-size:1.05rem; color:var(--ink-700); }
+  .rsvp{ margin-top:1rem; font-size:0.92rem; color:var(--ink-700); }
+  .rsvp strong{ color:var(--maroon-800); }
+  .signature{ margin-top:1.2rem; font-family:"Cormorant Garamond", serif; font-style:italic; font-size:1.1rem; color:var(--gold-300); }
+
+  .foot-space{ height:3rem; }
+</style>
+
+<canvas id="petal-canvas" aria-hidden="true"></canvas>
+
+<section id="cover">
+  <div class="toran" id="toran-cover" aria-hidden="true"></div>
+  <div class="cover-body">
+    <p class="eyebrow">You are invited</p>
+    <h1 class="cover-title">Griha Pravesham</h1>
+    <p class="cover-subtitle">A Housewarming Ceremony</p>
+    <div class="seal-wrap">
+      <button class="seal" id="sealBtn" type="button" aria-label="Open the invitation">
+        <svg viewBox="0 0 24 24" fill="none">
+          <path class="flame" d="M12 2c1.8 3 3.4 5.1 3.4 8a3.4 3.4 0 1 1-6.8 0C8.6 7.1 10.2 5 12 2z" fill="currentColor"/>
+          <path d="M6 22c0-3.6 2.7-5.5 6-5.5s6 1.9 6 5.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/>
+        </svg>
+      </button>
+      <span class="open-label">Click here to open</span>
+    </div>
+  </div>
+</section>
+
+<main id="main">
+  <div class="page-header">
+    <div class="toran" id="toran-page" aria-hidden="true"></div>
+  </div>
+
+  <section class="block" data-reveal>
+    <p class="card-eyebrow">With joy in our hearts</p>
+    <h2 class="cover-title" style="font-size:clamp(2.1rem,7vw,2.8rem)">Griha Pravesham</h2>
+    <p class="lead" style="margin-top:0.8rem;color:var(--ivory-200)"><span class="host-name" style="color:var(--gold-300)">[ Host Family Name ]</span> cordially invite you to bless their new home</p>
+    <p class="dates">[ Day 1 &amp; Day 2, Month Year ]</p>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block" data-reveal>
+    <div class="panel">
+      <span class="corner tl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner tr"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner bl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner br"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+
+      <div class="medallion">
+        <svg viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="57" stroke="#9C7326" stroke-width="2"/>
+          <circle cx="60" cy="60" r="50" stroke="#C99A3D" stroke-width="1"/>
+          <path d="M60 8c-10 6-16 6-24 2" stroke="#9C7326" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <path d="M60 8c10 6 16 6 24 2" stroke="#9C7326" stroke-width="2" fill="none" stroke-linecap="round"/>
+          <!-- Shiva -->
+          <g fill="#9C7326">
+            <circle cx="43" cy="46" r="8"/>
+            <path d="M35 47c-2-9 4-16 8-16 5 0 9 6 8 15" fill="none" stroke="#9C7326" stroke-width="2"/>
+            <circle cx="48" cy="38" r="2.2"/>
+            <path d="M31 92c0-16 5-30 12-34 7 4 12 18 12 34z"/>
+            <path d="M43 20l-9-8M43 20l9-8" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/>
+            <path d="M30 55l-7 6M30 61l-8 2M30 67l-7-2" stroke="#9C7326" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          </g>
+          <!-- Parvati -->
+          <g fill="#C9922A">
+            <circle cx="77" cy="46" r="8"/>
+            <path d="M77 30c-6 0-9 5-9 10h18c0-5-3-10-9-10z"/>
+            <circle cx="77" cy="24" r="3"/>
+            <path d="M64 92c0-16 6-30 13-34 7 4 13 18 13 34z"/>
+            <path d="M68 55l-3 8M86 55l3 8" stroke="#C9922A" stroke-width="1.6" stroke-linecap="round" fill="none"/>
+          </g>
+          <path d="M60 46v46" stroke="#E8C878" stroke-width="1" stroke-dasharray="1 4"/>
+        </svg>
+      </div>
+      <p class="card-eyebrow">Om Namah Shivaya</p>
+      <h3 class="card-title" style="font-size:1.35rem">Shiva &amp; Parvati</h3>
+      <p class="lead">We begin this new chapter under the blessings of Shiva and Parvati &mdash; the union that makes a house a home.</p>
+    </div>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block" data-reveal>
+    <p class="card-eyebrow" style="color:var(--gold-300)">Our new beginning</p>
+    <p class="lead" style="color:var(--ivory-200); max-width:40ch;">A home is more than walls and a roof &mdash; it is the warmth of the people who gather within it. As we light the first lamp in our new home, we would be blessed to have you beside us.</p>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block" data-reveal>
+    <p class="card-eyebrow" style="color:var(--gold-300)">The ceremony begins in</p>
+    <div class="countdown-row" id="countdown">
+      <div class="countdown-chip"><span class="countdown-num" id="cd-days">00</span><span class="countdown-label">Days</span></div>
+      <div class="countdown-chip"><span class="countdown-num" id="cd-hours">00</span><span class="countdown-label">Hours</span></div>
+      <div class="countdown-chip"><span class="countdown-num" id="cd-mins">00</span><span class="countdown-label">Mins</span></div>
+      <div class="countdown-chip"><span class="countdown-num" id="cd-secs">00</span><span class="countdown-label">Secs</span></div>
+    </div>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block block-wide" data-reveal>
+    <div class="panel">
+      <span class="corner tl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner tr"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner bl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner br"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+
+      <p class="card-eyebrow">Ceremonial schedule</p>
+      <h3 class="card-title" style="font-size:1.5rem">Two Sacred Days</h3>
+
+      <div class="day-panel">
+        <h4 class="day-title">Day One &mdash; [ Date ]</h4>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Ganapati Puja &amp; Punyahavachanam</span></div>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Griha Shanti Homam</span></div>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Evening Aarti</span></div>
+      </div>
+      <div class="day-panel">
+        <h4 class="day-title">Day Two &mdash; [ Date ]</h4>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Griha Pravesham Muhurtham</span></div>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Satyanarayana Puja</span></div>
+        <div class="agenda-row"><span class="agenda-time">[ Time ]</span><span class="agenda-event">Maha Mangal Aarti &amp; Bhojanam</span></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block" data-reveal>
+    <div class="panel">
+      <span class="corner tl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner tr"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner bl"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+      <span class="corner br"><svg viewBox="0 0 40 40" fill="none"><path d="M2 2c10 0 16 3 20 10M2 2c0 10 3 16 10 20" stroke="#9C7326" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="2.4" fill="#C99A3D"/></svg></span>
+
+      <p class="card-eyebrow">Venue</p>
+      <h3 class="card-title" style="font-size:1.4rem">Find Your Way Home</h3>
+      <div class="detail-row" style="justify-content:center">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 22s7-7.4 7-12.6A7 7 0 0 0 5 9.4C5 14.6 12 22 12 22z"/><circle cx="12" cy="9" r="2.4"/></svg>
+        <span><span class="detail-label">Address</span><span class="detail-value" id="venue-address">[ House No., Street, Area, City ]</span></span>
+      </div>
+      <a class="map-btn" id="map-link" href="#" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M9 20l-5-2V4l5 2 6-2 5 2v14l-5-2-6 2z"/><path d="M9 6v14M15 4v14"/></svg>
+        Get Directions
+      </a>
+    </div>
+  </section>
+
+  <div class="divider" data-reveal>
+    <span class="line"></span>
+    <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="4"/></svg>
+    <span class="line right"></span>
+  </div>
+
+  <section class="block" data-reveal>
+    <p class="blessing">&ldquo;Your presence and heartfelt blessings are the only gifts we seek.&rdquo;</p>
+    <p class="rsvp">RSVP <strong>[ Name ]</strong> &middot; [ Phone Number ]</p>
+    <p class="signature">With love and gratitude,<br>[ Host Family Name ]</p>
+  </section>
+
+  <div class="foot-space"></div>
+</main>
+
+<script>
+  (function(){
+    function buildToran(id, count){
+      var toran = document.getElementById(id);
+      if (!toran) return;
+      for (var i = 0; i < count; i++) {
+        var u = document.createElement('div');
+        u.className = 'toran-unit';
+        u.innerHTML = '<div class="toran-string"></div><div class="toran-leaf"></div>' + (i % 3 === 1 ? '<div class="toran-bell"></div>' : '');
+        toran.appendChild(u);
+      }
+    }
+    buildToran('toran-cover', 15);
+    buildToran('toran-page', 15);
+  })();
+
+  (function(){
+    var cover = document.getElementById('cover');
+    var main = document.getElementById('main');
+    var sealBtn = document.getElementById('sealBtn');
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    document.body.classList.add('locked');
+
+    sealBtn.addEventListener('click', function(){
+      document.body.classList.remove('locked');
+      if (reduced) {
+        cover.hidden = true;
+        main.classList.add('show');
+        document.querySelectorAll('[data-reveal]').forEach(function(el){ el.classList.add('in-view'); });
+        return;
+      }
+      cover.classList.add('opening');
+      setTimeout(function(){
+        cover.hidden = true;
+        requestAnimationFrame(function(){ main.classList.add('show'); });
+      }, 550);
+    });
+  })();
+
+  (function(){
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var items = document.querySelectorAll('[data-reveal]');
+    if (reduced || !('IntersectionObserver' in window)) {
+      items.forEach(function(el){ el.classList.add('in-view'); });
+      return;
+    }
+    var io = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if (entry.isIntersecting) { entry.target.classList.add('in-view'); io.unobserve(entry.target); }
+      });
+    }, { threshold: 0.15 });
+    items.forEach(function(el){ io.observe(el); });
+  })();
+
+  (function(){
+    // Placeholder ceremony date/time — update to the real muhurtham date & time.
+    var TARGET = new Date('2026-09-12T17:00:00');
+    var days = document.getElementById('cd-days');
+    var hours = document.getElementById('cd-hours');
+    var mins = document.getElementById('cd-mins');
+    var secs = document.getElementById('cd-secs');
+    function pad(n){ return String(n).padStart(2, '0'); }
+    function tick(){
+      var diff = Math.max(0, TARGET.getTime() - Date.now());
+      var d = Math.floor(diff / 86400000);
+      var h = Math.floor((diff % 86400000) / 3600000);
+      var m = Math.floor((diff % 3600000) / 60000);
+      var s = Math.floor((diff % 60000) / 1000);
+      days.textContent = pad(d); hours.textContent = pad(h); mins.textContent = pad(m); secs.textContent = pad(s);
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+
+  (function(){
+    var addressEl = document.getElementById('venue-address');
+    var mapLink = document.getElementById('map-link');
+    mapLink.href = 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(addressEl.textContent.trim());
+  })();
+
+  (function(){
+    var reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var canvas = document.getElementById('petal-canvas');
+    if (reduced) { canvas.remove(); return; }
+    var ctx = canvas.getContext('2d');
+    var w, h, petals = [];
+    var COLORS = ['#E2761F', '#EF9A42', '#C99A3D'];
+
+    function resize(){ w = canvas.width = window.innerWidth; h = canvas.height = window.innerHeight; }
+    resize();
+    window.addEventListener('resize', resize);
+
+    function makePetal(){
+      return { x: Math.random() * w, y: Math.random() * -h, r: 4 + Math.random() * 4,
+        speed: 0.4 + Math.random() * 0.6, drift: Math.random() * 0.8 - 0.4,
+        angle: Math.random() * Math.PI * 2, spin: (Math.random() * 0.02) - 0.01,
+        color: COLORS[Math.floor(Math.random() * COLORS.length)] };
+    }
+    for (var i = 0; i < 22; i++) petals.push(makePetal());
+
+    function tick(){
+      ctx.clearRect(0, 0, w, h);
+      for (var i = 0; i < petals.length; i++) {
+        var p = petals[i];
+        p.y += p.speed;
+        p.x += p.drift + Math.sin(p.y * 0.01) * 0.3;
+        p.angle += p.spin;
+        if (p.y > h + 10) { petals[i] = makePetal(); petals[i].y = -10; continue; }
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.angle);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.ellipse(0, 0, p.r, p.r * 0.6, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+  })();
+</script>
