@@ -10,8 +10,24 @@
 </head>
 <body>
 
+  <!-- Background music, started on the cover click so it satisfies browser autoplay rules -->
+  <audio id="bg-music" src="music.mp3" loop preload="auto"></audio>
+
   <!-- Ambient falling-petal background, drawn behind everything -->
   <canvas id="petal-canvas" class="petal-canvas" aria-hidden="true"></canvas>
+
+  <!-- Mute/unmute control, revealed once the invitation opens -->
+  <button id="music-toggle" class="music-toggle" type="button" aria-label="Mute music" aria-pressed="false" hidden>
+    <svg class="music-toggle__icon" data-icon="on" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 9v6h4l5 4V5L8 9H4z"/>
+      <path d="M16 8a5 5 0 0 1 0 8"/>
+      <path d="M18.5 5.5a9 9 0 0 1 0 13"/>
+    </svg>
+    <svg class="music-toggle__icon" data-icon="off" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" hidden>
+      <path d="M4 9v6h4l5 4V5L8 9H4z"/>
+      <path d="M16 9l5 6M21 9l-5 6"/>
+    </svg>
+  </button>
 
   <!-- ======================= COVER GATE ======================= -->
   <section id="cover" class="cover">

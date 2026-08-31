@@ -54,12 +54,20 @@ function wireCoverGate() {
   const cover = document.getElementById("cover");
   const page = document.getElementById("page");
   const sealBtn = document.getElementById("seal-btn");
+  const bgMusic = document.getElementById("bg-music");
+  const musicToggle = document.getElementById("music-toggle");
   const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   document.body.classList.add("is-locked");
 
   sealBtn.addEventListener("click", () => {
     document.body.classList.remove("is-locked");
+
+    // Start playback inside the click handler itself, so it still counts
+    // as a user gesture and isn't blocked by autoplay restrictions.
+    bgMusic.play().catch(() => {});
+    musicToggle.hidden = false;
+    requestAnimationFrame(() => musicToggle.classList.add("is-visible"));
 
     if (prefersReducedMotion) {
       cover.hidden = true;
@@ -73,6 +81,21 @@ function wireCoverGate() {
       cover.hidden = true;
       requestAnimationFrame(() => page.classList.add("is-visible"));
     }, 550);
+  });
+}
+
+function wireMusicToggle() {
+  const bgMusic = document.getElementById("bg-music");
+  const musicToggle = document.getElementById("music-toggle");
+  const iconOn = musicToggle.querySelector('[data-icon="on"]');
+  const iconOff = musicToggle.querySelector('[data-icon="off"]');
+
+  musicToggle.addEventListener("click", () => {
+    bgMusic.muted = !bgMusic.muted;
+    iconOn.hidden = bgMusic.muted;
+    iconOff.hidden = !bgMusic.muted;
+    musicToggle.setAttribute("aria-pressed", String(bgMusic.muted));
+    musicToggle.setAttribute("aria-label", bgMusic.muted ? "Unmute music" : "Mute music");
   });
 }
 
@@ -196,6 +219,7 @@ function init() {
   addDividerEyes();
   buildFeatherGarlands();
   wireCoverGate();
+  wireMusicToggle();
   wireScrollReveal();
   wireCountdown();
   wireVenueMapLink();
