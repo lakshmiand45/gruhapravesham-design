@@ -490,17 +490,27 @@ body.is-locked {
   text-wrap: balance;
 }
 
-/* deity medallion */
+/* deity portrait */
 
-.medallion {
-  display: flex;
-  justify-content: center;
-  margin-bottom: 0.6rem;
+.deity-frame {
+  width: min(72%, 220px);
+  aspect-ratio: 4 / 5;
+  margin: 0 auto 1rem;
+  border-radius: 108px 108px 10px 10px;
+  overflow: hidden;
+  box-shadow:
+    0 14px 26px rgba(0, 0, 0, 0.32),
+    0 0 0 1px var(--gold-500),
+    0 0 0 6px var(--teal-900),
+    0 0 0 7px var(--gold-500);
 }
 
-.medallion svg {
-  width: 120px;
-  height: 120px;
+.deity-frame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
 }
 
 /* countdown */
